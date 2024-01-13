@@ -4,7 +4,6 @@ const dotenv = require('dotenv')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 dotenv.config();
-const saltRounds = 10;
 const app = express();
 const port = 3001;
 // Database connection configuration
@@ -21,7 +20,24 @@ db.connect((err) => {
   console.log('Connected to the MySQL database');
 });
 app.use(bodyParser.json());
-app.use(cors())
+// Define the allowed origins
+const allowedOrigins = ['https://yueksel.me', 'https://home.yueksel.me'];
+
+// CORS middleware function to check the origin
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+};
+
+// Enable CORS for requests coming from allowed origins
+app.use(cors(corsOptions));
+
+
 app.get('/api/users/:id', (req, res) => {
   const { id } = req.params;
   const query = 'SELECT * FROM users WHERE id = ?';
