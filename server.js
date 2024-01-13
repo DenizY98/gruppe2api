@@ -21,21 +21,22 @@ db.connect((err) => {
 });
 app.use(bodyParser.json());
 // Define the allowed origins
-const allowedOrigins = ['https://yueksel.me', 'https://home.yueksel.me'];
-
-// CORS middleware function to check the origin
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  }
-};
+// Define the allowed origins
+const allowedOrigins = ['http://home.yueksel.me', 'https://yueksel.me'];
 
 // Enable CORS for requests coming from allowed origins
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true // <-- Use this if your front end needs to send credentials (cookies, HTTP auth)
+}));
 
 
 app.get('/api/users/:id', (req, res) => {
