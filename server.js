@@ -20,10 +20,8 @@ db.connect((err) => {
   console.log('Connected to the MySQL database');
 });
 app.use(bodyParser.json());
-// Define the allowed origins
-const allowedOrigins = ['https://yueksel.me', 'https://home.yueksel.me', 'http://localhost:3000','http://localhost:443'];
 
-// CORS middleware function to check the origin
+const allowedOrigins = ['https://yueksel.me', 'https://home.yueksel.me', 'http://localhost:3000','http://localhost:443'];
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -33,11 +31,19 @@ const corsOptions = {
     }
   }
 };
-
-// Enable CORS for requests coming from allowed origins
 app.use(cors(corsOptions));
+// app.use(cors())
 
-
+app.get('/api/ids', (req, res) => {
+  const query = 'SELECT id FROM users';
+  db.query(query, (err, results) => {
+    if (err) {
+      res.status(500).send('Error fetching user IDs');
+    } else {
+      res.status(200).json(results.map(row => row.id));
+    }
+  });
+});
 app.get('/api/users/:id', (req, res) => {
   const { id } = req.params;
   const query = 'SELECT * FROM users WHERE id = ?';
