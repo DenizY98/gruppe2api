@@ -143,13 +143,13 @@ const fetchSensorData = async (apiurl, password, sensorName, entity_id) => {
     const response = await fetch(haUrl, { headers: headers });
     if (!response.ok) {
       console.error(`Error fetching sensor data for ${sensorName}:`, await response.text());
-      return { sensorName, sensordata: null };
+      return { sensorName, sensordata: null, unit: null };
     }
     const data = await response.json();
-    return { sensorName, sensordata: data.state };
+    return { sensorName, sensordata: data.state, unit: data.attributes.unit_of_measurement };
   } catch (err) {
     console.error(`Error fetching sensor data for ${sensorName}:`, err);
-    return { sensorName, sensordata: null };
+    return { sensorName, sensordata: null, unit: null };
   }
 };
 app.get('/api/markers', async (req, res) => {
